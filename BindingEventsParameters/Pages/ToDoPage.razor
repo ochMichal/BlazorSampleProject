@@ -1,0 +1,95 @@
+﻿@page "/ToDoPage"
+<h3>ToDo Page</h3>
+<br />
+
+<label for="Summary">Theme Color:</label>
+<select class="form-control"
+        @bind="@SelectedColor">
+
+    @foreach (var option in Options)
+    {
+        <option value="@option">
+            @option
+        </option>
+    }
+</select>
+<br />
+
+<CascadingValue Value="SelectedColor" Name="ThemeColor">
+    <ToDoComponent Tasks="Tasks"
+                   @ref="ToDoComponentControl"
+                   RemoveTaskChanged="RemoveTask" />
+</CascadingValue>
+
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <input class="form-control"
+                   placeholder="Add a Task"
+                   @bind-value="newTaskDescription" />
+        </div>
+        <div class="col">
+            <button class="btn btn-primary"
+                    type="button"
+                    @onclick="AddTask">
+                Add Task
+            </button>
+        </div>
+    </div>
+</div>
+
+@code {
+
+    // Collection to hold all the Tasks
+    private List<TaskItem> Tasks = new List<TaskItem>();
+
+    // This will hold a reference to the ToDoComponent
+    private ToDoComponent ToDoComponentControl;
+
+    // This method will run when the control is loaded
+    protected override void OnInitialized()
+    {
+        // Add a Task
+        Tasks.Add(new TaskItem()
+        {
+            TaskDescription = "Task One",
+            IsComplete = false
+        });
+    }
+
+    // Property to hold the description of a new Task
+    // The textbox is bound to this property
+    private string newTaskDescription;
+
+    private void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTaskDescription))
+        {
+            // Create a new Task using the current value of the newTaskDescription property
+            var NewTask = new TaskItem();
+            NewTask.TaskDescription = newTaskDescription;
+            NewTask.IsComplete = false;
+
+            //Add the new Task to the collection by calling a method on the child component
+            ToDoComponentControl.AddNewTask(NewTask);
+
+            //Clear the newTaskDescription value so the text box will now be empty
+            newTaskDescription = string.Empty;
+        }
+    }
+
+    private void RemoveTask(TaskItem paramTaskItem)
+    {
+        // Remove the Task from the collection
+        Tasks.Remove(paramTaskItem);
+    }
+
+    // SelectedColor will be the cascading parameter, Set the color to Green
+    protected string SelectedColor { get; set; } = "Green";
+
+    // Create a collection of colors that will be bound to a dropdown
+    List<string> Options = new List<string>() { "Green", "Red", "Blue" };
+
+
+}

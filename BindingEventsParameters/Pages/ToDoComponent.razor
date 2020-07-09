@@ -1,0 +1,46 @@
+﻿
+<ul class="list-group">
+    @foreach (var Task in Tasks)
+    {
+    <li class="list-group-item form-check form-check-inline">
+
+        <button type="button" class="btn btn-link"
+                @onclick="(() => RemoveTask(Task))">
+            [Delete]
+        </button>
+
+        <label class="form-check-label"
+               for="inlineCheckbox1"
+               style="color:@ThemeColorParameter">
+
+            @Task.TaskDescription
+
+        </label>
+    </li>
+    }
+</ul>
+
+@code {
+    // Collection to hold the Tasks passed in by the parent component
+    [Parameter] public List<TaskItem> Tasks { get; set; }
+
+    //This method will be called directly by the parent component
+    public void AddNewTask(TaskItem paramTaskItem)
+    {
+        //Add a new Task to the collection
+        Tasks.Add(paramTaskItem);
+    }
+
+    // RemoveTaskChanged is an EventCallback that will notify the parent component when an item is to be removed
+    // passing the item to be removed
+    [Parameter] public EventCallback<TaskItem> RemoveTaskChanged { get; set; }
+
+    private async Task RemoveTask(TaskItem paramTaskItem)
+    {
+        // Notify parent component to Remove the Task from the collection
+        await RemoveTaskChanged.InvokeAsync(paramTaskItem);
+    }
+
+    [CascadingParameter(Name = "ThemeColor")]
+    protected string ThemeColorParameter { get; set; }
+}
